@@ -239,7 +239,7 @@ skip_spaces(void)
 char *
 get_id(char *id)
 {
-  int i;
+  int i = 0;
   char *p = id;
   /* it's guaranteed by the caller that the first character in stdin is a
    * letter */
@@ -249,7 +249,10 @@ get_id(char *id)
     if (c == EOF) {
       fatal_pos("Unexpected end of file\n");
     } else if (isalnum(c) || c == '_') {
-      ++i;
+      if (i++ >= MAX_TOKEN_LEN) {
+        fatal_pos("Too long token occured. Can't proceed.\n");
+      }
+
       *p++ = c;
     } else {
       _ungetchar(c);
