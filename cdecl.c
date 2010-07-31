@@ -366,6 +366,8 @@ get_token()
     token.type = RBRACE;
   } else if (c == '*') {
     token.type = POINTER;
+  } else {
+    fatal_pos("Unexpected token encountered\n");
   }
 }
 
