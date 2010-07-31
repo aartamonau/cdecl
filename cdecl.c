@@ -98,6 +98,9 @@ static struct token_t stack[MAX_TOKENS]; /**< stack of tokens to the left from
 static int head = 0;                     /**< head of the #stack */
 
 
+static bool verbose = false;    /**< behave verbosely */
+
+
 /**
  * Prints a message about fatal condition and exits with #EXIT_FAILURE exit
  * code.
@@ -292,6 +295,31 @@ skip_to_char(char end)
 
 
 /**
+ * If #verbose is @e true then dumps an information about current token to
+ * @e stderr.
+ *
+ */
+static void
+dump_token(void)
+{
+  if (verbose) {
+    fprintf(stderr, "token: %s", token_to_str(token.type));
+
+    switch (token.type) {
+    case TYPE:
+    case SPECIFIER:
+    case IDENTIFIER:
+      fprintf(stderr, ", %s\n", token.info.name);
+      break;
+    default:
+      /* just new line */
+      fprintf(stderr, "\n");
+    }
+  }
+}
+
+
+/**
  * Reads token from @e stdin and stores it in #token.
  *
  */
@@ -369,6 +397,8 @@ get_token()
   } else {
     fatal_pos("Unexpected token encountered\n");
   }
+
+  dump_token();
 }
 
 
@@ -485,8 +515,21 @@ pronounce(void)
 
 
 int
-main(void)
+main(int argc, char *argv[])
 {
+  if (argc > 2) {
+    fatal("%s: wrong number of arguments given\n", argv[0]);
+  }
+
+  if (argc == 2) {
+    if (strcmp(argv[1], "--verbose") == 0 ||
+        strcmp(argv[1], "-v") == 0) {
+      verbose = true;
+    } else {
+      fatal("%s: invalid argument (%s)\n", argv[0], argv[1]);
+    }
+  }
+
   pronounce();
 
   return EXIT_SUCCESS;
