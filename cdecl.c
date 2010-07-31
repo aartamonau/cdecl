@@ -65,13 +65,22 @@ token_to_str(enum token_type_t type)
 }
 
 
+/// Number of additional place should be allocated by
+/// #token_t::info::size to store possible @e struct or
+/// @e enum prefix.
+#define STRUCT_ENUM_ADDENDUM 7
+
+
 /// Token;
 struct token_t {
   enum token_type_t type;       /**< type of the token */
 
 
   union {
-    char name[MAX_TOKEN_LEN + 1];  /**< string representation of the token */
+    char name[STRUCT_ENUM_ADDENDUM + MAX_TOKEN_LEN + 1];  /**< string
+                                                             representation
+                                                             of the token */
+
     int  size;                     /**< if ::type is #ARRAY then it's the size
                                     * of array (or -1 in case size has not been
                                     * specified) */
@@ -318,6 +327,26 @@ get_token()
         strcmp(name, "double")   == 0)
     {
       token.type = TYPE;
+    } else if (strcmp(name, "struct") == 0 ||
+               strcmp(name, "enum")   == 0) {
+      token.type = TYPE;
+
+
+      skip_spaces();
+
+      /* if structure or enum is defined in place then just skip the
+       * definition */
+      int tmp = _getchar();
+      if (tmp == '{') {
+        skip_to_char('}');
+      } else {
+        size_t len = strlen(name);
+
+        name[len] = ' ';
+
+        _ungetchar(tmp);
+        get_id(name + len + 1);
+      }
     } else if (strcmp(name, "const")    == 0 ||
                strcmp(name, "volatile") == 0)
     {
