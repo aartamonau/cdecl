@@ -299,24 +299,27 @@ get_token()
   } else if (c == ';') {
     token.type   = END;
   } else if (isalpha(c)) {
+    /* alias */
+    char *name = token.info.name;
+
     /* some type, specifier or declarator starts here */
     _ungetchar(c);
 
-    get_id(token.info.name);
+    get_id(name);
 
-    if (strcmp(token.info.name, "int")      == 0 ||
-        strcmp(token.info.name, "char")     == 0 ||
-        strcmp(token.info.name, "void")     == 0 ||
-        strcmp(token.info.name, "signed")   == 0 ||
-        strcmp(token.info.name, "unsigned") == 0 ||
-        strcmp(token.info.name, "short")    == 0 ||
-        strcmp(token.info.name, "long")     == 0 ||
-        strcmp(token.info.name, "float")    == 0 ||
-        strcmp(token.info.name, "double")   == 0)
+    if (strcmp(name, "int")      == 0 ||
+        strcmp(name, "char")     == 0 ||
+        strcmp(name, "void")     == 0 ||
+        strcmp(name, "signed")   == 0 ||
+        strcmp(name, "unsigned") == 0 ||
+        strcmp(name, "short")    == 0 ||
+        strcmp(name, "long")     == 0 ||
+        strcmp(name, "float")    == 0 ||
+        strcmp(name, "double")   == 0)
     {
       token.type = TYPE;
-    } else if (strcmp(token.info.name, "const")    == 0 ||
-               strcmp(token.info.name, "volatile") == 0)
+    } else if (strcmp(name, "const")    == 0 ||
+               strcmp(name, "volatile") == 0)
     {
       token.type = SPECIFIER;
     } else {
